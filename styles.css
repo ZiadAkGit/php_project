@@ -20,8 +20,7 @@ body {
 }
 
 .img {
-	width: 150px;
-	height: 150px;
+	width: 30%;
 	border-radius: 10px;
 }
 
@@ -180,6 +179,7 @@ body {
 
 .products-table th,
 .products-table td {
+	width: 0%;
 	padding: 11px;
 	text-align: center;
 	border-bottom: 1px solid #eee;

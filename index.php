@@ -13,7 +13,7 @@ if (isset($_POST['submit'])) {
     $result2 = mysqli_query($conn, $sql2);
     $isAdmin = mysqli_fetch_assoc($result2)['isAdmin'];
     if (mysqli_num_rows($result) > 0) {
-        if ($isAdmin) {
+        if ($isAdmin && $password == $user['password']) {
             header("Location: admin_dashboard.php");
         } else if ($password != $user['password']) {
             echo "<script>alert('Incorrect password. Please try again.');</script>";
@@ -42,7 +42,7 @@ if (isset($_POST['submit'])) {
 <body>
     <div class="container">
         <div class="header">
-            <h1>Welcome Back</h1>
+            <h1>Welcome!</h1>
             <p>Login to access your account</p>
         </div>
 
