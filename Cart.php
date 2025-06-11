@@ -4,7 +4,6 @@ require_once 'User.php';
 
 session_start();
 $user_id = $_SESSION['id'];
-
 $sql = "SELECT * FROM cart WHERE user_id = '$user_id'";
 $result = mysqli_query($conn, $sql);
 
@@ -26,41 +25,41 @@ if (isset($_POST['edit_item']) && isset($_POST['new_quantity'])) {
 if (isset($_POST['submit_order'])) {
     $sql = "SELECT * FROM cart WHERE user_id = '$user_id'";
     $result = mysqli_query($conn, $sql);
-    $products_query = "SELECT * FROM products";
-    $products_result = mysqli_query($conn, $products_query);
-    $products = mysqli_fetch_assoc($products_result);
-    $results = mysqli_fetch_assoc($result);
-    if ($products['quantity'] >= $results['quantity']) {
-        while ($row = $result->fetch_assoc()) {
-            $product_id = $row['product_id'];
-            $quantity = $row['quantity'];
-            $cart_query = "DELETE FROM cart WHERE user_id = '$user_id' AND product_id = '$product_id'";
-            $quantity_query = "UPDATE products SET quantity = quantity - '$quantity' WHERE id = '$product_id'";
-            $result_cart = mysqli_query($conn, $cart_query);
-            $result_quantity = mysqli_query($conn, $quantity_query);
+    $cart_items = mysqli_fetch_all($result, MYSQLI_ASSOC);
+    $insufficient_stock = false;
+    foreach ($cart_items as $row) {
+        $product_id = $row['product_id'];
+        $quantity = $row['quantity'];
+        $product_query = "SELECT quantity FROM products WHERE id = '$product_id'";
+        $product_result = mysqli_query($conn, $product_query);
+        $product_data = mysqli_fetch_assoc($product_result);
+        if ($product_data['quantity'] < $quantity) {
+            $insufficient_stock = true;
+            break;
         }
-        if (!$result_cart || !$result_quantity) {
-            die("Error processing order: " . mysqli_error($conn));
-        } else {
-            if ($result_cart["quantity"] <= $result_quantity["quantity"])
-                echo "<script>alert('Order placed successfully!');
-            window.location.href = 'dashboard.php';
-            </script>";
-            else {
-                echo "<script>alert('Order failed successfully!');
-            </script>";
-            }
-        }
-    } else {
+    }
+    if ($insufficient_stock) {
         echo "<script>alert('Insufficient stock for one or more products. Please adjust your cart.');
         window.location.href = 'Cart.php';
         </script>";
-        $cart_query = "DELETE FROM cart WHERE user_id = '$user_id' AND product_id = '$product_id'";
-        $result_cart = mysqli_query($conn, $cart_query);
-        exit();
+        $delete_query = "DELETE FROM cart WHERE user_id = '$user_id' AND product_id = '$product_id'";
+        mysqli_query($conn, $delete_query);
+    } else {
+        foreach ($cart_items as $row) {
+            $product_id = $row['product_id'];
+            $quantity = $row['quantity'];
+            $delete_query = "DELETE FROM cart WHERE user_id = '$user_id' AND product_id = '$product_id'";
+            $update_query = "UPDATE products SET quantity = quantity - '$quantity' WHERE id = '$product_id'";
+            mysqli_query($conn, $delete_query);
+            mysqli_query($conn, $update_query);
+        }
     }
-    exit();
+    echo "<script>alert('Order placed successfully!');
+    window.location.href = 'dashboard.php';
+    </script>";
 }
+
+
 ?>
 
 <!DOCTYPE html>

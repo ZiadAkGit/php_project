@@ -59,8 +59,11 @@ if (isset($_POST['add_to_cart'])) {
 <body>
     <div class="container">
         <div class="header">
-            <h1>Welcome to our Watch Shop</h1>
-            <p>We sell the best handmade watches at the best prices</p>
+            <?php
+            echo "<h1>Welcome ${username}</h1>";
+            echo "<p>Here you can buy our finest watches!</p>";
+            ?>
+
             <br>
             <br>
 
@@ -103,7 +106,7 @@ if (isset($_POST['add_to_cart'])) {
                                 $product_id = $product['id'];
                                 echo "<tr>
                                     <td><img class='img' src='{$product['image_url']}' alt='{$product['name']}'><br><b>{$product['name']}</b></td>
-                                    <td><b>{$product['price']} ₪</b></td>
+                                    <td><b>" . number_format($product['price'], 2) . "₪</b></td>
                                     <td><b>{$product['quantity']}</b></td>
                                     <td>
                                     <button type='button' onclick='addQuantity($product_id)' class='btn' style='padding: 5px 10px; margin-left: 5px;'>+</button>

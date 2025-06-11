@@ -1,7 +1,7 @@
 <?php
 require_once 'connect_to_DB.php';
-session_start();
 if (isset($_POST['submit'])) {
+    session_start();
     $email = $_POST['email'];
     $password = $_POST['password'];
     $sql = "SELECT * FROM users WHERE email = '$email'";
